@@ -1,0 +1,48 @@
+<html>
+
+<head>
+  <title>Tennis ball</title>
+</head>
+
+<body>
+  <script type="module">
+    import { Screen } from './screen.js'
+    import { Setup } from './setup.js'
+    import { report } from './helpers.js'
+    import { TennisBall } from './tennisBall.js'
+    const tennisBall = new TennisBall(Setup.setupAndGetContext(Screen), Screen, report);
+    document.getElementById('btnStart').onclick = function () {
+      tennisBall.stop();
+      tennisBall.start();
+    };      
+  </script>
+
+  <div>
+    <div>
+      <canvas id="displayCanvas" style="background-color: black;" width="640" height="480">
+      </canvas>
+    </div>
+
+    <div style="padding: 10px;">
+      <button style="margin: 10px;" type="button" class="btn btn-primary" id="btnStart">Start here</button>
+      <div id="gravity" style="margin: 10px;">
+        undefined
+      </div>
+
+      <div id="velocity" style="margin: 10px;">
+        undefined
+      </div>
+
+      <div id="positionY" style="margin: 10px;">
+        undefined
+      </div>
+
+      <div id="inertionFactor" style="margin: 10px;">
+        undefined
+      </div>
+
+    </div>
+  </div>
+</body>
+
+</html>
