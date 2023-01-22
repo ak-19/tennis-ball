@@ -1,63 +1,54 @@
+import { Dimensions } from './dimensions.js';
+
 export class TennisBall {
-	constructor(context, Screen, reportFunction) {
-		this.ctx = context;
-		this.width = Screen.width;
-		this.height = Screen.height;
-		this.run = false;
-		this.y = undefined;
+	constructor(displayContext) {
+		this.ctx = displayContext;
+		this.width = Dimensions.SCREEN.WIDTH;
+		this.height = Dimensions.SCREEN.HEIGHT;
+		this.radius = Dimensions.BALL.RADIUS;
+		this.setInitialValues();
+		this.showOnBallCanvas();
+	}
+
+	setInitialValues() {
+		this.y = 0 + Dimensions.BALL.RADIUS;
+		this.x = (Dimensions.SCREEN.WIDTH / 2) - Dimensions.BALL.RADIUS / 2;
 		this.g = 0.98;
-		this.velocity = 1;
-		this.ballSize = 20;
-		this.ballRadius = 10;
-		this.x = (Screen.width / 2) - 10;
-		this.reportFunction = reportFunction;
 		this.inertionFactor = 0.9;
-		this.initialize()
+		this.velocity = 1;
 	}
 
-	initialize() {
-		this.ctx.beginPath();
-		this.ctx.arc(this.x, 0 + this.ballRadius, this.ballRadius, 0, 2 * Math.PI, false);
-		this.ctx.fillStyle = 'yellow';
-		this.ctx.fill();
-	}
-
-	showOnCanvas() {
+	showOnBallCanvas() {
 		this.ctx.clearRect(0, 0, this.width, this.height);
 		this.ctx.beginPath();
-		this.ctx.arc(this.x, this.y, this.ballRadius, 0, 2 * Math.PI, false);
+		this.ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
 		this.ctx.fillStyle = 'yellow';
 		this.ctx.fill();
 		this.ctx.closePath();
 	}
 
-	draw() {
-		this.showOnCanvas();
+	fixDirectionIfNeeded() {
+		if (this.y + this.radius > this.height) {
+			this.y = this.height - this.radius;
+			this.velocity *= -this.inertionFactor;
+			this.inertionFactor -= 0.01;
+		}
+	}
 
-		this.reportFunction(this.g, this.velocity, this.y, this.inertionFactor);
+	animate() {
+		this.showOnBallCanvas();
 
 		this.y += this.velocity;
 		this.velocity += this.g;
 
-		if (this.y + this.ballRadius > this.height) {
-			this.y = this.height - this.ballRadius;
-			this.velocity *= -this.inertionFactor;
-			this.inertionFactor -= 0.01;
-			if (this.inertionFactor < 0) {
-				return;
-			}
-		}
+		this.fixDirectionIfNeeded();
 
-		requestAnimationFrame(this.draw.bind(this));
-	}
+		if (this.inertionFactor < 0) return;
 
-	start() {
-		this.draw();
+		requestAnimationFrame(this.animate.bind(this));
 	}
 
 	stop() {
-		this.y = 0 + this.ballRadius;
-		this.inertionFactor = 0.9;
-		this.velocity = 1;
+		this.setInitialValues();
 	}
 }
